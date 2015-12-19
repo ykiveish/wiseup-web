@@ -1,0 +1,50 @@
+<script>
+    function API () {
+        var self = this;
+    }
+    
+    API.prototype.GetImage = function (user_id, script_uuid, path, obj_name, callback) {
+        $.get("http://wiseup.cloudapp.net:8080/api/get_script_image/" + user_id + "/" + script_uuid + "/" + path, function(data, status) {
+            callback (obj_name, "data:image/png;base64," + data);
+        });
+    }
+    
+    API.prototype.GetWidgetDB = function (user_id, script_id, callback) {
+        $.get("http://wiseup.cloudapp.net:8080/api/get_script_db/" + user_id + "/" + script_id, function(data, status) {
+            callback (data, status);
+        });
+    }
+    
+    API.prototype.SetWidgetDB = function (user_id, script_id, db, callback) {
+        $.get("http://wiseup.cloudapp.net:8080/api/set_script_db/" + user_id + "/" + script_id + "/" + db, function(data, status) {
+            callback (data);
+        });
+    }
+    
+    API.prototype.GetUserSensorsInfo = function (user_id, callback) {
+        $.get("http://wiseup.cloudapp.net:8080/api/get_sensors_info/" + user_id, function(data, status) {
+            callback (data, status);
+        });
+    }
+    
+    API.prototype.GetUserSensorsInfoByType = function (user_id, callback) {
+        $.get("http://wiseup.cloudapp.net:8080/api/get_sensors_info/" + user_id, function(data, status) {
+            callback (data, status);
+        });
+    }
+    
+    API.prototype.AddSensorAssociation = function (data, callback) {
+        $.get("http://wiseup.cloudapp.net:8080/api/add_sensor_association/" + data.key + "/" + data.script_uuid + "/" + data.sensor_addr, function(data, status) {
+            callback (data, status);
+        });
+    }
+    
+    API.prototype.RemoveSensorAssociation = function (data, callback) {
+        $.get("http://wiseup.cloudapp.net:8080/api/remove_sensor_association/" + data.key + "/" + data.script_uuid + "/" + data.sensor_addr, function(data, status) {
+            callback (data, status);
+        });
+    }
+</script>
+<div>
+    <div id="app-content"></div>
+</div>

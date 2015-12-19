@@ -1,0 +1,6 @@
+{
+    "name": "Security",
+    "types": [3],
+    "address": [],
+    "init_db": '{"status": 0}'
+}

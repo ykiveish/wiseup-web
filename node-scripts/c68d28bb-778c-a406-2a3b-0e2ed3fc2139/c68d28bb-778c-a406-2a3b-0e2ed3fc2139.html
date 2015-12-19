@@ -1,0 +1,224 @@
+<script>
+    var user_key     = '<USER_KEY>';
+    var script_uuid  = 'c68d28bb-778c-a406-2a3b-0e2ed3fc2139';
+    var script_id    = 2;
+    var appDB        = '';
+    var sensorsList  = [];
+    
+    var threshold_limit  = 'Equal';
+    var threshold_value  = 0;
+    var threshold_sensor = '';
+        
+    api = new API ();
+    
+    function ResetValues () {
+        threshold_limit  = 'Equal';
+        threshold_value  = 0;
+        
+        $('#obj-value').slider('setValue', threshold_value, true);
+        $('#btn-threshold').children('button').each(function () {
+            if ( $(this).html() == threshold_limit ) {
+                $(this).addClass('active').siblings().removeClass('active');
+            }
+        });
+        $('#sp-message').html('Not configured sensor');
+    }
+    
+    function SetSelection (index) {
+        console.log (index);
+        threshold_sensor = sensorsList[index];
+        
+        for (var sensor_idx = 0; sensor_idx < appDB.length; sensor_idx++) {
+            if (appDB[sensor_idx].sensor_addr == threshold_sensor.addr) {
+                threshold_limit = appDB[sensor_idx].threshold_limit;
+                threshold_value = appDB[sensor_idx].threshold_value;
+                
+                console.log (appDB[sensor_idx]);
+                
+                $('#sp-selected-sensor-name').html(threshold_sensor.name);
+                $('#obj-value').slider('setValue', threshold_value, true);
+                $('#btn-threshold').children('button').each(function () {
+                    if ( $(this).html() == threshold_limit ) {
+                        $(this).addClass('active').siblings().removeClass('active');
+                    }
+                });
+                $('#sp-message').html('');
+                
+                return;
+            }
+        }
+        
+        ResetValues ();
+    }
+    
+    function UpdateItemLocalDB (item) {
+        for (var sensor_idx = 0; sensor_idx < appDB.length; sensor_idx++) {
+            if (appDB[sensor_idx].sensor_addr == threshold_sensor.addr) {
+                appDB[sensor_idx].threshold_limit = threshold_limit;
+                appDB[sensor_idx].threshold_value = threshold_value;
+                return;
+            }
+        }
+        
+        var new_item = JSON.parse('{"sensor_addr": ' + threshold_sensor.addr + 
+                                ', "threshold_limit": "' + threshold_limit + 
+                                '", "threshold_value": ' + threshold_value + '}');
+        
+        console.log (new_item);
+        
+        appDB.push (new_item);
+    }
+    
+    function DeleteItemLocalDB (item) {
+    }
+    
+    function Load () {
+        api.GetWidgetDB (user_key, script_id, function (data, status) {
+            if (data == '') {
+                return;
+            }
+            
+            appDB = JSON.parse(data);
+            var first_item = appDB[0];
+            console.log (appDB[0]);
+            
+            $('#btn-threshold').children('button').each(function () {
+                if ( $(this).html() == first_item.threshold_limit ) {
+                    $(this).addClass('active').siblings().removeClass('active');
+                    threshold_limit = $(this).html();
+                }
+            });
+            
+            $('#obj-value').slider('setValue', first_item.threshold_value, true);
+            
+            api.GetUserSensorsInfo (user_key, function (data, status) {
+                var inject_html = '';
+                for (idx = 0; idx < data.length; idx++) {
+                    sensorsList.push (data[idx]);                
+                    inject_html += '<li><a onClick=SetSelection(' + idx + ');>' + data[idx].name + '</a></li>';
+                }
+                $('#ul-sensor-list').html(inject_html);
+                
+                $('#ul-sensor-list li a').click(function(){
+                    $('#sp-selected-sensor-name').html($(this).text());
+                });
+                
+                for (var sensor_idx = 0; sensor_idx < sensorsList.length; sensor_idx++) {
+                    console.log (sensorsList[sensor_idx].addr + ' - ' + first_item.sensor_addr);
+                    if (sensorsList[sensor_idx].addr == first_item.sensor_addr) {
+                        $('#sp-selected-sensor-name').html(sensorsList[sensor_idx].name);
+                        threshold_sensor = sensorsList[sensor_idx];
+                    }
+                }
+            });
+        });
+        
+        $('#obj-value').slider ({
+            formatter: function (value) {
+                threshold_value = value;
+                return value;
+            }
+        });
+        
+        $('#btn-save').click( function () {
+            console.log (threshold_sensor.addr + ', ' + threshold_value + ', ' + threshold_limit);
+            if (threshold_sensor.addr < 1) {
+                console.log ('No sensor was selected');
+                return;
+            }
+            
+            UpdateItemLocalDB ();
+            api.SetWidgetDB (user_key, script_id, JSON.stringify (appDB), function (data, status) {
+                $('#sp-message').html('');
+                var mes = JSON.parse('{"key": "' + user_key
+                                        + '", "script_uuid": "' + script_uuid
+                                        + '", "sensor_addr": ' + threshold_sensor.addr + '}');
+                console.log (mes);
+                api.AddSensorAssociation (JSON.parse('{"key": "' + user_key
+                                        + '", "script_uuid": "' + script_uuid
+                                        + '", "sensor_addr": ' + threshold_sensor.addr + '}'), function (data, status) {
+                                            console.log (data);
+                                        });
+            });
+        });
+        
+        $('#btn-threshold button').click(function() {
+            $(this).addClass('active').siblings().removeClass('active');
+            $('#btn-threshold').children('button').each(function () {
+                if ( $(this).hasClass('active') ) {
+                    console.log ($(this).html());
+                    threshold_limit = $(this).html();
+                }
+            });
+        });
+    }
+    
+    Load ();
+</script>
+
+<style>
+    .app-context {
+        width:300px;
+        display: block;
+        height: 300px;
+        position: relative;
+        opacity: 0.9;
+        text-align: center;
+        margin: 0 auto;
+    }
+    
+    .app-body {
+        margin: 0 auto;
+    }
+    
+    .slider-selection {
+        background: #428041;
+    }
+
+    .slider-handle {
+        background: green;
+    }
+</style>
+    
+<div>
+    <div class='pure-u-1-1'>
+        <div class='pure-g'>
+            <div class='app-context'>
+                <br />
+                <div class='pure-u-1-1 app-body'>
+                    <div class='well well-lg' id='dvSensorConf'>
+                        <div class='dropdown'>
+                            <button class='btn btn-default dropdown-toggle' type='button' id='btn-selection' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true'>
+                                <span id='sp-selected-sensor-name'>Select sensor</span>
+                                <span class='caret'></span>
+                            </button>
+                            <ul class='dropdown-menu' aria-labelledby='btn-selection' id='ul-sensor-list'>
+                            </ul>
+                        </div>
+                        <br />
+                        <span style='color:RED' id='sp-message'></span>
+                        <br />
+                        <input id='obj-value' data-slider-id='ex1Slider' type='text' data-slider-min='0' data-slider-max='100' data-slider-step='1' data-slider-value='14' />
+                        <br />
+                        <br />
+                        <div class='btn-group' role='group' aria-label='...' id='btn-threshold'>
+                            <button type='button' class='btn btn-default'>Upper</button>
+                            <button type='button' class='btn btn-default'>Equal</button>
+                            <button type='button' class='btn btn-default'>Lower</button>
+                        </div>
+                        <br />
+                        <br />
+                        <div class='pure-g'>
+                            <div class='pure-u-1-2'>
+                                <button type='button' class='btn btn-default btn-success' id='btn-save'>Save</button>
+                            </div>
+                            <div class='pure-u-1-2'>
+                                <button type='button' class='btn btn-default btn-danger' id='btn-delete'>Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>

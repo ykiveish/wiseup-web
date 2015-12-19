@@ -1,0 +1,84 @@
+<script>
+    var user_key     = '<USER_KEY>';
+    var script_uuid  = '989a419c-22b1-42b2-baad-96b619a8b663';
+    var script_id    = 1;
+    var appDB        = '';
+    
+    api = new API ();
+    
+    function SetSecurity () {
+        appDB.status = (appDB.status == 1) ? 0 : 1;
+        
+        api.SetWidgetDB (user_key, script_id, JSON.stringify (appDB), function (data, status) {
+            Load ();
+        });
+    }
+    
+    function Load () {
+        api.GetWidgetDB (user_key, script_id, function (data, status) {
+            if (data == '') {
+                return;
+            }
+            
+            appDB = JSON.parse(data);
+            if (appDB.status == 1) {
+                api.GetImage(user_key, script_uuid, 'locked.png', '#imgTest', function (obj, data) {
+                    $('#imgTest').attr('src', data);
+                    $('#spMsg').html('Turn OFF the securty');
+                });
+            } else {
+                api.GetImage(user_key, script_uuid, 'unlock.png', '#imgTest', function (obj, data) {
+                    $('#imgTest').attr('src', data);
+                    $('#spMsg').html('Turn ON the securty');
+                });
+            }
+        });
+    }
+    
+    Load ();
+</script>
+
+<style>
+    .app-context {
+        width:300px;
+        display: block;
+        height: 300px;
+        position: relative;
+        opacity: 0.9;
+        text-align: center;
+        margin: 0 auto;
+    }
+    
+    .app-title {
+        position: relative;
+        width:100%;
+        display: block;
+        height: 40px;
+        color: #23A8E0;
+        font-size: 18px;
+        top: 15px;
+    }
+    
+    .app-body {
+    }
+</style>
+    
+<div>
+    <div class='pure-u-1-1'>
+        <br />
+        <div class='pure-g'>
+            <div class='app-context' >
+                <div class='well well-lg' id='dvSensorConf'>
+                    <div class='pure-u-1-1'>
+                        <div class='app-title'><span id='spMsg'>Turn the security ON</span></div>
+                    </div>
+                    
+                    <div class='pure-u-1-1 app-body'>
+                        <br />
+                        <img src='#' id='imgTest' onclick='SetSecurity ()' />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>

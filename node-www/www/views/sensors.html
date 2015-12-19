@@ -1,0 +1,5 @@
+<div>
+    <div class="sensor-title">My Sensors</div>
+    <sensor ng-repeat="sensor in data.sensors" data="sensor" on-action="doAction(sensor)" on-toggle-favorite="toggleFavorite(sensor)">
+    </sensor>
+</div>

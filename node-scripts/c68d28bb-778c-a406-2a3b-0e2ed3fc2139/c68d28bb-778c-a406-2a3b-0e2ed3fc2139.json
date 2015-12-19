@@ -1,0 +1,6 @@
+{
+    "name": "Threshold",
+    "types": [],
+    "address": [],
+    "init_db": '[{"sensor_addr": 0, "threshold_limit": "Equal", "threshold_value": 0}]'
+}

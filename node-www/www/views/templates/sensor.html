@@ -1,0 +1,28 @@
+<div class="pure-u-1-2 pure-u-md-1-4 pure-u-lg-1-6">
+    <div class="pure-g">
+        <div class="sensor">
+            <div class="pure-u-1-1">
+                <div class="sensor-name">{{data.name}}</div>
+            </div>
+            
+            <div class="sensor-content">
+                <div class="pure-g" ng-show="data.type==1 || data.type==2">
+                    <div ng-switch on={{data.type}} class="sensor-data-type-a-icon">
+                        <img ng-switch-when="1" src='../../img/temp.png' style="width:50px; height:60;">
+                        <span ng-switch-when="1">C</span>
+                        <img ng-switch-when="2" src='../../img/luminance.png' style="width:50px; height:60;">
+                        <span ng-switch-when="2">%</span>
+                    </div>
+                    <div class="pure-u-1-1 sensor-value">{{data.value}}</div>
+                </div>
+                <div class="pure-g sensor-data-type-b" ng-show="data.type==3 || data.type==4 || data.type==6">
+                    <div ng-switch on="{{data.type}}">
+                        <img ng-switch-when="3" ng-class="{'blink_me': data.value == 1}" src='../../img/move.png' style="width:70px; height:70px;">
+                        <img ng-switch-when="4" ng-click="onAction(data)" ng-src="{{data.value == 1 && '../../img/power-on.png' || '../../img/power-off.png'}}" style="width:70px; height:60px;">
+                        <img ng-switch-when="6" ng-click="onAction(data)" ng-src="{{data.value == 1 && '../../img/power-on.png' || '../../img/power-off.png'}}" style="width:70px; height:60px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

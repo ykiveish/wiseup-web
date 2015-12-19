@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html ng-app="app">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
+    <!--<![endif]-->
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/wiseup.css">
+    <link rel="stylesheet" href="css/sensor.css">
+    <link rel="stylesheet" href="css/widget.css">
+    
+    <link rel="stylesheet" href="css/font-awesome-4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/grids-responsive-min.css">
+    <link rel="stylesheet" href="css/pure-min.css">
+    
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-slider.css">
+    
+    <title>Wiseup</title>
+</head>
+
+<body>
+    <div>
+        <div class="header">
+            <div class="header-dktop">
+                <div class="pure-g">
+                    <div class="pure-u-1-5">
+                        <div class="menu-button"><img src="img/shop.png" style="width:30px;">
+                        </div>
+                    </div>
+                    <div class="pure-u-3-5">
+                        <div class="menu-button"><img src="img/logo.png" style="width:60px; height:50;">
+                        </div>
+                    </div>
+                    <div class="pure-u-1-5">
+                        <div class="menu-button"><img src="img/menu.png" style="width:30px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-view class="content">
+        </div>
+        <div class="footer">
+            <div class="footer-dktop">
+                <div class="pure-g">
+                    <div class="pure-u-1-4">
+                        <div class="menu-button"><a href="#/settings"><img src="img/settings.png" style="width:30px;"></a>
+                        </div>
+                    </div>
+                    <div class="pure-u-1-4">
+                        <div class="menu-button"><a href="#/widgets"><img src="img/widgets.png" style="width:30px;"></a>
+                        </div>
+                    </div>
+                    <div class="pure-u-1-4">
+                        <div class="menu-button"><a href="#/sensors"><img src="img/sensors.png" style="width:30px;"></a>
+                        </div>
+                    </div>
+                    <div class="pure-u-1-4">
+                        <div class="menu-button"><a href="#/map"><img src="img/dashboard.png" style="width:30px;"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-slider.js"></script>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/angular/angular.min.js"></script>
+    <script type="text/javascript" src="js/angular/angular-route.min.js"></script>
+    <script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <!--services-->
+    <script type="text/javascript" src="js/services/cordovaService.js"></script>
+    <script type="text/javascript" src="js/services/sensorsService.js"></script>
+    <script type="text/javascript" src="js/services/serverService.js"></script>
+    <script type="text/javascript" src="js/services/mapService.js"></script>
+    <script type="text/javascript" src="js/services/widgetInfoService.js"></script>
+    <!--factories-->
+    <script type="text/javascript" src="js/factories/sensorsFactory.js"></script>
+    <script type="text/javascript" src="js/factories/mapFactory.js"></script>
+    <!-- directives -->
+    <script type="text/javascript" src="js/directives/sensor.js"></script>
+    <script type="text/javascript" src="js/directives/location.js"></script>
+    <script type="text/javascript" src="js/directives/responder.js"></script>
+    <script type="text/javascript" src="js/directives/area.js"></script>
+    <script type="text/javascript" src="js/directives/generic.js"></script>
+    <script type="text/javascript" src="js/directives/widgetInfo.js"></script>
+    <!--controllers-->
+    <script type="text/javascript" src="js/controllers/sensorsController.js"></script>
+    <script type="text/javascript" src="js/controllers/mapController.js"></script>
+    <script type="text/javascript" src="js/controllers/widgetInfoController.js"></script>
+    <script type="text/javascript" src="js/controllers/widgetController.js"></script>
+</body>
+
+</html>
