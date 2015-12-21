@@ -4,12 +4,11 @@
     var script_id    = 2;
     var appDB        = '';
     var sensorsList  = [];
+    var scope        = $('#app-content').scope();
     
     var threshold_limit  = 'Equal';
     var threshold_value  = 0;
     var threshold_sensor = '';
-        
-    api = new API ();
     
     function ResetValues () {
         threshold_limit  = 'Equal';
@@ -73,7 +72,7 @@
     }
     
     function Load () {
-        api.GetWidgetDB (user_key, script_id, function (data, status) {
+        scope.API_GetWidgetDB (user_key, script_id, function (data, status) {
             if (data == '') {
                 return;
             }
@@ -91,7 +90,7 @@
             
             $('#obj-value').slider('setValue', first_item.threshold_value, true);
             
-            api.GetUserSensorsInfo (user_key, function (data, status) {
+            scope.API_GetUserSensorsInfo (user_key, function (data, status) {
                 var inject_html = '';
                 for (idx = 0; idx < data.length; idx++) {
                     sensorsList.push (data[idx]);                
@@ -128,13 +127,13 @@
             }
             
             UpdateItemLocalDB ();
-            api.SetWidgetDB (user_key, script_id, JSON.stringify (appDB), function (data, status) {
+            scope.API_SetWidgetDB (user_key, script_id, JSON.stringify (appDB), function (data, status) {
                 $('#sp-message').html('');
                 var mes = JSON.parse('{"key": "' + user_key
                                         + '", "script_uuid": "' + script_uuid
                                         + '", "sensor_addr": ' + threshold_sensor.addr + '}');
                 console.log (mes);
-                api.AddSensorAssociation (JSON.parse('{"key": "' + user_key
+                scope.API_AddSensorAssociation (JSON.parse('{"key": "' + user_key
                                         + '", "script_uuid": "' + script_uuid
                                         + '", "sensor_addr": ' + threshold_sensor.addr + '}'), function (data, status) {
                                             console.log (data);

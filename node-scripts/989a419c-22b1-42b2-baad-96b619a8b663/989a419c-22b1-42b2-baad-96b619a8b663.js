@@ -7,6 +7,7 @@ function API () {
 }
 
 API.prototype.GetWidgetDB = function (script_uuid, callback) {
+	console.log ("CLIENT - GetWidgetDB");
     params.db.GetScriptIdByUUID (script_uuid, function (err, data) {
         if (data.length < 1) {
             callback ({status: "FAILED"}, null);

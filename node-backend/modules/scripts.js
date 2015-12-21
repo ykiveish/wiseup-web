@@ -49,7 +49,7 @@ Scripts.prototype.ScriptAPI_GetAllUserScripts = function (key, callback) {
                     script_uuid: scripts[i].script_uuid,
                     script_name: scripts[i].script_name,
                     user_id: scripts[i].user_id,
-                    script_db: scripts[i].script_db,
+                    // script_db: scripts[i].script_db,
                     record_enabled: scripts[i].record_enabled
                 };
                 list.push (script);

@@ -3,31 +3,30 @@
     var script_uuid  = '989a419c-22b1-42b2-baad-96b619a8b663';
     var script_id    = 1;
     var appDB        = '';
-    
-    api = new API ();
+    var scope        = $('#app-content').scope();
     
     function SetSecurity () {
         appDB.status = (appDB.status == 1) ? 0 : 1;
         
-        api.SetWidgetDB (user_key, script_id, JSON.stringify (appDB), function (data, status) {
+        scope.API_SetWidgetDB (user_key, script_id, JSON.stringify (appDB), function (data, status) {
             Load ();
         });
     }
     
     function Load () {
-        api.GetWidgetDB (user_key, script_id, function (data, status) {
+        scope.API_GetWidgetDB (user_key, script_id, function (data, status) {
             if (data == '') {
                 return;
             }
             
             appDB = JSON.parse(data);
             if (appDB.status == 1) {
-                api.GetImage(user_key, script_uuid, 'locked.png', '#imgTest', function (obj, data) {
+                scope.API_GetImage(user_key, script_uuid, 'locked.png', '#imgTest', function (obj, data) {
                     $('#imgTest').attr('src', data);
                     $('#spMsg').html('Turn OFF the securty');
                 });
             } else {
-                api.GetImage(user_key, script_uuid, 'unlock.png', '#imgTest', function (obj, data) {
+                scope.API_GetImage(user_key, script_uuid, 'unlock.png', '#imgTest', function (obj, data) {
                     $('#imgTest').attr('src', data);
                     $('#spMsg').html('Turn ON the securty');
                 });

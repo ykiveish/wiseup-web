@@ -14,7 +14,7 @@ var     jsSensorDB    = [];
 var     app           = express();
 var     updater       = new SensorUpdater();
 var     db            = new SqliteAdapter('wiseupdb.db');
-var     scriptDB      = new FsAdapter('/home/ykiveish/workspace/wiseup-web/node-scripts/');
+var     scriptDB      = new FsAdapter('/home/pi/workspace/proj/wiseup-web/node-scripts/');
 
 const   apis          = require('./api/api.js');
 var     api           = new apis (db, scriptDB);
@@ -189,14 +189,25 @@ apiRouter.route('/get_users_scripts_info/:key').get(function(req, res) {
     return api.Security.CheckUserKey (key, function (err, status) {
         if (status == "TRUE") {
             api.Scripts.GetAllUserScripts (key, function (err, scripts) {
+                ret = {
+                    status: "FAIL",
+                    data: ""
+                };
+                    
                 if (err.status == "PASS") {
-                    res.json (scripts);
-                } else {
-                    res.json (err);
+                    ret.status = "SUCCESS",
+                    ret.data   = scripts;
                 }
+                
+                res.json (ret);
             });
         } else {
-            res.json("FAIL");
+            ret = {
+                status: "FAIL",
+                data: ""
+            };
+            
+            res.json(ret);
         }
     });
 });

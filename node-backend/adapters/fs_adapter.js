@@ -2,6 +2,8 @@ var fs = require('fs');
 var vm = require('vm');
 var console;
 
+var path = "/home/ykiveish/workspace/wiseup-web/node-backend/";
+
 function FSAdapter (path) {
     var self = this;
     this.scriptPath = path;
@@ -27,10 +29,10 @@ FSAdapter.prototype.GetScriptConfig = function (scriptUUID, callback) {
 FSAdapter.prototype.ExecuteScript = function (scriptUUID, data, callback) {
     console.log ("ExecuteScript");
     var code = "";
-    fs.readFile('/home/ykiveish/workspace/wiseup-web/node-scripts/' + scriptUUID + '/' + scriptUUID + '.js', function (e, fsCode) {
+    fs.readFile(this.scriptPath + scriptUUID + '/' + scriptUUID + '.js', function (e, fsCode) {
         code = fsCode.toString();
         
-        var filename = '/home/ykiveish/workspace/wiseup-web/node-backend/web-api.js';
+        var filename = path + 'web-api.js';
         vm.runInNewContext(code, {
             require: require,
             console: console,
@@ -45,7 +47,7 @@ FSAdapter.prototype.ExecuteScript = function (scriptUUID, data, callback) {
 FSAdapter.prototype.GetIconScript = function (scriptUUID, callback) {
     console.log ("GetIconScript");
     var image = "";
-    fs.readFile('/home/ykiveish/workspace/wiseup-web/node-scripts/' + scriptUUID + '/' + scriptUUID + '.png', function (e, fsCode) {
+    fs.readFile(this.scriptPath + scriptUUID + '/' + scriptUUID + '.png', function (e, fsCode) {
         image = new Buffer (fsCode, 'binary').toString('base64');
         callback (image);
     });
@@ -54,7 +56,7 @@ FSAdapter.prototype.GetIconScript = function (scriptUUID, callback) {
 FSAdapter.prototype.GetImageScript = function (req_data, callback) {
     console.log ("GetImageScript");
     var image = "";
-    fs.readFile('/home/ykiveish/workspace/wiseup-web/node-scripts/' + req_data.script_uuid + '/images/' + req_data.file_name, function (e, fsCode) {
+    fs.readFile(this.scriptPath + req_data.script_uuid + '/images/' + req_data.file_name, function (e, fsCode) {
         image = new Buffer (fsCode, 'binary').toString('base64');
         callback (image);
     });

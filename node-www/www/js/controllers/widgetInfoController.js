@@ -23,6 +23,7 @@ angular.module('app').controller('widgetInfoController', function($scope, widget
             callback (data);
         }).
         error(function(data, status, headers, config) {
+            console.log ("GetUserWidgets ERROR");
         });
     }
     
@@ -38,27 +39,30 @@ angular.module('app').controller('widgetInfoController', function($scope, widget
         });
     }
     
-    $scope.GetUserWidgets ("85994f97-5fb4-2915-6ccf-98c3bf16f664", function (widgets) {
-        $scope.data.WidgetInfos = widgets;
+    $scope.GetUserWidgets (serverService.userKey, function (widgets) {
+        $scope.data.WidgetInfos = "";
+        if (widgets.status == "SUCCESS") {
+            $scope.data.WidgetInfos = widgets.data;
         
-        for (var i = 0; i < $scope.data.WidgetInfos.length; i++) {
-            $scope.GetScriptIcon ({
-                user_key: "85994f97-5fb4-2915-6ccf-98c3bf16f664",
-                script_uuid: $scope.data.WidgetInfos[i].script_uuid,
-                script_id: $scope.data.WidgetInfos[i].script_id
-            },
-            function (data) {
-                for (var i = 0; i < $scope.data.WidgetInfos.length; i++) {
-                    if (data.script_id == $scope.data.WidgetInfos[i].script_id) {
-                        $scope.data.WidgetInfos[i].image = data.image.substring(1, data.image.length - 1);
-                        console.log ($scope.data.WidgetInfos);
-                        return;
+            for (var i = 0; i < $scope.data.WidgetInfos.length; i++) {
+                $scope.GetScriptIcon ({
+                    user_key: serverService.userKey,
+                    script_uuid: $scope.data.WidgetInfos[i].script_uuid,
+                    script_id: $scope.data.WidgetInfos[i].script_id
+                },
+                function (data) {
+                    for (var i = 0; i < $scope.data.WidgetInfos.length; i++) {
+                        if (data.script_id == $scope.data.WidgetInfos[i].script_id) {
+                            $scope.data.WidgetInfos[i].image = data.image.substring(1, data.image.length - 1);
+                            console.log ($scope.data.WidgetInfos);
+                            return;
+                        }
                     }
-                }
-            });
+                });
+            }
+            
+            console.log ("GetUserWidgets ... Exit");
         }
-        
-        console.log ("GetUserWidgets ... Exit");
     });
     
     $scope.onLaunch = function (widget) {
