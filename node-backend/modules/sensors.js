@@ -1,4 +1,11 @@
+const moment = require('moment');
+
 var SensorAPI_sensorsDB = [];
+var SensorAPI_scriptAssociationDB = [];
+var SensorAPI_Context = {
+    lastSensorDBUpdate: moment().unix(),
+    updateDBTimeout: 60
+};
 
 function Sensors (database, filesystem) {
     self = this;
@@ -7,6 +14,7 @@ function Sensors (database, filesystem) {
 }
 
 Sensors.prototype.SensorAPI_LoadSensorsToCache = function (data, callback) {
+    var sensorApi = this;
     this.db.GetAllSensors (function (err, sensors) {
         for (i = 0; i < sensors.length; i++) {
             var sensor = {
@@ -19,6 +27,18 @@ Sensors.prototype.SensorAPI_LoadSensorsToCache = function (data, callback) {
             };
             SensorAPI_sensorsDB.push (sensor);
         }
+        
+        sensorApi.db.GetAllAssociations (function (err, associations) {
+            for (i = 0; i < associations.length - 1; i++) {
+                var association = {
+                    id: associations[i].association_id,
+                    script_uuid: associations[i].script_uuid,
+                    addr: associations[i].sensor_address,
+                    enabled: associations[i].association_enabled
+                };
+                SensorAPI_scriptAssociationDB.push (association);
+            }
+        });
         
         if (sensors.length > 0) {
             callback ({status:"OK"}, {length:sensors.length});
@@ -64,11 +84,43 @@ Sensors.prototype.SensorAPI_SetSensorInfo = function (data, callback) {
         if (SensorAPI_sensorsDB[i].addr == data.sensor.addr) {
             // Update the data to DB.
             if (SensorAPI_sensorsDB[i].value != data.sensor.value) {
-                SensorAPI_sensorsDB[i] = data.sensor;
-                this.db.UpdateSensorValue (data.sensor);
-                this.db.GetScriptsOnSensorChange (data.sensor.addr, function (err, uuids) {
+                SensorAPI_sensorsDB[i].value = data.sensor.value;
+                SensorAPI_sensorsDB[i].ts = data.sensor.ts;
+                
+                var sensorIndex = i;
+                if (Math.abs (moment().unix() - SensorAPI_Context.lastSensorDBUpdate) > SensorAPI_Context.updateDBTimeout) {
+                    SensorAPI_Context.lastSensorDBUpdate = moment().unix();
+                    this.db.UpdateSensorValue (data.sensor);
+                }
+                
+                var executionCounter = 0;
+                for (i = 0; i < SensorAPI_scriptAssociationDB.length; i++) {
+                    if (SensorAPI_scriptAssociationDB[i].addr == data.sensor.addr) {
+                        // console.log (i + ", " + SensorAPI_scriptAssociationDB[i].addr + ", " + SensorAPI_scriptAssociationDB[i].script_uuid);
+                        this.fs.ExecuteScript (SensorAPI_scriptAssociationDB[i].script_uuid, 
+                            {
+                                db: this.db,
+                                fs: this.fs,
+                                sensors: this,
+                                sensor: data.sensor,
+                                script_data: SensorAPI_scriptAssociationDB[i]
+                            },
+                            function (err, data) {
+                                executionCounter++;
+                        });
+                    }
+                }
+                
+                if (executionCounter > 0) {
+                    callback (SensorAPI_sensorsDB[sensorIndex], {status: "OK"}, {status: "UPDATE_EXEC"});
+                } else {
+                    callback (SensorAPI_sensorsDB[sensorIndex], {status: "OK"}, {status: "UPDATE_NO_EXEC"});
+                }
+                
+                
+                /*this.db.GetScriptsOnSensorChange (data.sensor.addr, function (err, uuids) {
                     if (uuids.length < 1) {
-                        callback ({status: "OK"}, {status: "UPDATE_NO_EXEC"});
+                        callback (SensorAPI_sensorsDB[sensorIndex], {status: "OK"}, {status: "UPDATE_NO_EXEC"});
                         return;
                     }
                     
@@ -90,13 +142,13 @@ Sensors.prototype.SensorAPI_SetSensorInfo = function (data, callback) {
                         function (err, data) {
                             res_counter++;
                             if (res_counter == uuids.length) {
-                                callback ({status: "OK"}, {status: "UPDATE_EXEC"});
+                                callback (SensorAPI_sensorsDB[sensorIndex], {status: "OK"}, {status: "UPDATE_EXEC"});
                             }
                         });
                     });
-                });
+                });*/
             } else {
-                callback ({status: "OK"}, {status: "NO_CHANGE"});
+                callback (SensorAPI_sensorsDB[i], {status: "OK"}, {status: "NO_CHANGE"});
             }
             return;
         }

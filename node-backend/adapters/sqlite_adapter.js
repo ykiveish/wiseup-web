@@ -58,6 +58,13 @@ function SqliteAdapter(dbFile) {
             "`script_uuid`          VARCHAR(128) NOT NULL," +
             "`sensor_address`       UNSIGNEDBIGINT NOT NULL," +
             "`association_enabled`  TINYINT NOT NULL);");
+        /* 
+        sql.run("CREATE TABLE IF NOT EXISTS `tbl_log_script` (" +
+            "`log_id`               INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+            "`log_ts`               VARCHAR(128) NOT NULL," +
+            "`log_message`          UNSIGNEDBIGINT NOT NULL," +
+            "`script_id`            TINYINT NOT NULL);");
+        */
     });
 }
 

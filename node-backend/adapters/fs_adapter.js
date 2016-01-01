@@ -2,11 +2,37 @@ var fs = require('fs');
 var vm = require('vm');
 var console;
 
-var path = "/home/ykiveish/workspace/wiseup-web/node-backend/";
+var path = "/home/pi/workspace/proj/wiseup-web/node-backend/"; // TODO - Make this path relative.
 
 function FSAdapter (path) {
     var self = this;
     this.scriptPath = path;
+}
+
+FSAdapter.prototype.WriteLog = function (type, msg, callback) {
+    console.log ("WriteLog");
+    
+    var date = new Date();
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec  = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    var year = date.getFullYear();
+
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+    
+    fs.appendFile('/home/pi/workspace/proj/wiseup-web/node-logs/general.txt', "#[" + year + "." + month + "." + day + " " + hour + ":" + min + ":" + sec + "] " + msg + "\n", function (err) {
+        callback ();
+    });
 }
 
 FSAdapter.prototype.GetScriptUI = function (scriptUUID, callback) {

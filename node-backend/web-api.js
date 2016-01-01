@@ -27,6 +27,11 @@ app.use(function(req, res, next) {
     next();
 });
 
+var clientId = 0;
+var SensorSessions = {};
+
+var testy = 1000;
+
 var apiRouter = express.Router();
 var sseRouter = express.Router();
 app.use('/api', apiRouter);
@@ -67,7 +72,7 @@ apiRouter.route('/create_user/:name/:password').get(function(req, res) {
 apiRouter.route('/get_sensors_info/:key').get(function(req, res) {
     var key = req.params.key;
     
-    return api.Security.CheckUserKey (key, function (err, data) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, data) {
         if (data == "TRUE") {
             api.Sensors.GetSensorsInfo (null, function (err, sensors) {
                 res.json(sensors);
@@ -82,7 +87,7 @@ apiRouter.route('/get_sensors_info_by_type/:key/:type').get(function(req, res) {
     var key = req.params.key;
     var type = req.params.type;
     
-    return api.Security.CheckUserKey (key, function (err, data) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, data) {
         if (data == "TRUE") {
             api.Sensors.GetSensorsInfoByType ({sensor_type: type}, function (err, sensors) {
                 res.json(sensors);
@@ -96,7 +101,7 @@ apiRouter.route('/get_sensors_info_by_type/:key/:type').get(function(req, res) {
 apiRouter.route('/set_sensor_value/:key/:addr/:type/:value').get(function(req, res) {
     var key = req.params.key;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var data = {
                 sensor: {
@@ -109,12 +114,16 @@ apiRouter.route('/set_sensor_value/:key/:addr/:type/:value').get(function(req, r
                 user_key: key 
             };
             
-            updater.Update(data.addr, data, function () { });
-            api.Sensors.SetSensorInfo (data, function (err, status) {
+            // updater.Update(data.addr, data, function () { });
+            api.Sensors.SetSensorInfo (data, function (sensor, err, status) {
+                for (clientId in SensorSessions) {
+                    if (SensorSessions[clientId].addr == sensor.addr) {
+                        SensorSessions[clientId].session.write("data: " + JSON.stringify(sensor));
+                        SensorSessions[clientId].session.write("\n\n"); // <- Push a message to a single attached client
+                    }
+                }
                 res.json(status);
             });
-            
-            console.log (data);
         } else {
             res.json("FAIL");
         }
@@ -126,7 +135,7 @@ apiRouter.route('/add_sensor_association/:key/:script_uuid/:sensor_addr').get(fu
     var addr = req.params.sensor_addr;
     var uuid = req.params.script_uuid;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var req_data = {
                 sensor_addr: addr,
@@ -147,7 +156,7 @@ apiRouter.route('/remove_sensor_association/:key/:script_uuid/:sensor_addr').get
     var addr = req.params.sensor_addr;
     var uuid = req.params.script_uuid;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var req_data = {
                 sensor_addr: addr,
@@ -186,7 +195,7 @@ apiRouter.route('/get_scripts_info').get(function(req, res) {
 apiRouter.route('/get_users_scripts_info/:key').get(function(req, res) {
     var key = req.params.key;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             api.Scripts.GetAllUserScripts (key, function (err, scripts) {
                 ret = {
@@ -231,7 +240,7 @@ apiRouter.route('/install_script/:key/:script_id').get(function(req, res) {
     var key = req.params.key;
     var script_id = req.params.script_id;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var script_req = {
                 script_id: script_id,
@@ -252,7 +261,7 @@ apiRouter.route('/get_script_ui/:key/:script_uuid').get(function(req, res) {
     var key  = req.params.key;
     var uuid = req.params.script_uuid;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var ui_req = {
                 script_uuid: uuid
@@ -271,7 +280,7 @@ apiRouter.route('/get_script_icon/:key/:script_uuid').get(function(req, res) {
     var key  = req.params.key;
     var uuid = req.params.script_uuid;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var ui_req = {
                 script_uuid: uuid
@@ -291,7 +300,7 @@ apiRouter.route('/get_script_image/:key/:script_uuid/:file_name').get(function(r
     var uuid = req.params.script_uuid;
     var name = req.params.file_name;
     
-    return api.Security.CheckUserKey (key, function (err, status) {
+    return api.Security.CheckUserKey (key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var ui_req = {
                 script_uuid: uuid,
@@ -308,7 +317,7 @@ apiRouter.route('/get_script_image/:key/:script_uuid/:file_name').get(function(r
 });
 
 apiRouter.route('/get_script_db/:key/:script_id').get(function(req, res) {
-    return api.Security.CheckUserKey (req.params.key, function (err, status) {
+    return api.Security.CheckUserKey (req.params.key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var db_req = {
                 script_id: req.params.script_id
@@ -323,7 +332,7 @@ apiRouter.route('/get_script_db/:key/:script_id').get(function(req, res) {
 });
 
 apiRouter.route('/set_script_db/:key/:script_id/:script_db').get(function(req, res) {
-    return api.Security.CheckUserKey (req.params.key, function (err, status) {
+    return api.Security.CheckUserKey (req.params.key, "TRUE", function (err, status) {
         if (status == "TRUE") {
             var db_req = {
                 script_id: req.params.script_id,
@@ -360,6 +369,27 @@ apiRouter.route('/delete_all_associations').get(function(req, res) {
     });
 });
 
+sseRouter.route('/register_sensor_update/:id').get(function(req, res) {
+    console.log ("[register] ( " + req.params.id + ")");
+    
+	req.socket.setTimeout(0);
+    res.writeHead(200, {
+    	'Content-Type': 'text/event-stream',  // <- Important headers
+    	'Cache-Control': 'no-cache',
+    	'Connection': 'keep-alive'
+    });
+
+    res.write('\n');
+    (function(clientId) {
+        SensorSessions[clientId] = {
+                                addr: req.params.id, 
+                                session: res
+                            };  // <- Add this client to those we consider "attached"
+        req.on ("close", function () { delete SensorSessions[clientId]} );  // <- Remove this client when he disconnects
+    })(++clientId)
+});
+
+/*
 var msgID = 0;
 sseRouter.route('/register_sensor_update/:id').get(function(req, res) {
     var sensorID = req.params.id;
@@ -385,7 +415,7 @@ sseRouter.route('/register_sensor_update/:id').get(function(req, res) {
     
     updater.on(sensorID, onSensorValueUpdate);
 });
-
+*/
 
 /* INIT SERVER FLOW */
 api.Sensors.LoadSensorsToCache (null, function (err, data) {

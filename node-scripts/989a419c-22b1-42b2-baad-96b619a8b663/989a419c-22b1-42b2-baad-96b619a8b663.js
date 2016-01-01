@@ -1,4 +1,11 @@
-var nodemailer = require("nodemailer");
+// var nodemailer = require("nodemailer");
+/*var email = require("emailjs/email");
+var server  = email.server.connect({
+   user:    "wiseup.defender@yahoo.com", 
+   password:"defender4u@", 
+   host:    "smtp.mail.yahoo.com", 
+   ssl:     true
+});*/
 
 console.log ("SECURITY");
 
@@ -41,7 +48,20 @@ api.GetWidgetDB (params.script_data.script_uuid, function (err, data) {
                 if (sensor.value == 1) {
                     // TODO - Update local DB that user was acknowledged more than 3 times. 
                     console.log ("ALERT >> CALL THE POLICE ...");
-                    var smtpTransport = nodemailer.createTransport("SMTP", {
+                    /*server.send({
+                        text:    'i hope this works', 
+                        from:    'wiseup.defender@yahoo.com', 
+                        to:      'Jen4ik Kiveisha lodmilak@gmail.com',
+                        cc: '',
+                        subject: 'CALL THE POLICE'
+                    }, function(err, message) { 
+                        console.log("ERROR:: " + err);
+                        console.log("MESSAGE:: " + message); 
+                    });
+                    params.fs.WriteLog ("INFO", "ALERT >> CALL THE POLICE ...", function () {
+                        
+                    });*/
+                    /*var smtpTransport = nodemailer.createTransport("SMTP", {
                         service: "Mandrill",
                         auth: {
                             user: "wiseup.mail@gmail.com",
@@ -61,7 +81,7 @@ api.GetWidgetDB (params.script_data.script_uuid, function (err, data) {
                         } else {
                             console.log ("Message sent: " + response.message);
                         }
-                    });
+                    });*/
                 } else {
                     console.log ("ALERT >> NOTHING MOVED ...");
                 }
